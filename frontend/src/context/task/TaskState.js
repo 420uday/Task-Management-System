@@ -1,0 +1,137 @@
+import React, { useReducer } from 'react';
+import axios from 'axios';
+import TaskContext from './TaskContext';
+import taskReducer from './TaskReducer';
+
+const TaskState = props => {
+  const initialState = {
+    tasks: [],
+    current: null,
+    loading: true,
+    error: null
+  };
+
+  const [state, dispatch] = useReducer(taskReducer, initialState);
+
+  // Get Tasks
+  const getTasks = async () => {
+    try {
+      setLoading();
+      const res = await axios.get('/api/tasks');
+
+      dispatch({
+        type: 'GET_TASKS',
+        payload: res.data
+      });
+    } catch (err) {
+      dispatch({
+        type: 'TASK_ERROR',
+        payload: err.response.msg
+      });
+    }
+  };
+
+  // Add Task
+  const addTask = async task => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      setLoading();
+      const res = await axios.post('/api/tasks', task, config);
+
+      dispatch({
+        type: 'ADD_TASK',
+        payload: res.data
+      });
+    } catch (err) {
+      dispatch({
+        type: 'TASK_ERROR',
+        payload: err.response.msg
+      });
+    }
+  };
+
+  // Delete Task
+  const deleteTask = async id => {
+    try {
+      setLoading();
+      await axios.delete(`/api/tasks/${id}`);
+
+      dispatch({
+        type: 'DELETE_TASK',
+        payload: id
+      });
+    } catch (err) {
+      dispatch({
+        type: 'TASK_ERROR',
+        payload: err.response.msg
+      });
+    }
+  };
+
+  // Update Task
+  const updateTask = async task => {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    };
+
+    try {
+      setLoading();
+      const res = await axios.put(
+        `/api/tasks/${task._id}`,
+        task,
+        config
+      );
+
+      dispatch({
+        type: 'UPDATE_TASK',
+        payload: res.data
+      });
+    } catch (err) {
+      dispatch({
+        type: 'TASK_ERROR',
+        payload: err.response.msg
+      });
+    }
+  };
+
+  // Set Current Task
+  const setCurrent = task => {
+    dispatch({ type: 'SET_CURRENT', payload: task });
+  };
+
+  // Clear Current Task
+  const clearCurrent = () => {
+    dispatch({ type: 'CLEAR_CURRENT' });
+  };
+
+  // Set Loading
+  const setLoading = () => dispatch({ type: 'SET_LOADING' });
+
+  return (
+    <TaskContext.Provider
+      value={{
+        tasks: state.tasks,
+        current: state.current,
+        loading: state.loading,
+        error: state.error,
+        getTasks,
+        addTask,
+        deleteTask,
+        setCurrent,
+        clearCurrent,
+        updateTask
+      }}
+    >
+      {props.children}
+    </TaskContext.Provider>
+  );
+};
+
+export default TaskState;
