@@ -3,14 +3,18 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js",
-    "start": "node app.js"
-  },
+  "start": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts start",
+  "build": "set NODE_OPTIONS=--openssl-legacy-provider && react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject"
+}
+
+  ,
   "keywords": [
     "Task manager",
     "Tasks"
   ],
-  "author": "Aayush",
+  "author": "Uday",
   "license": "ISC",
   "description": "The backend part of simple task manager with user authentication",
   "dependencies": {
